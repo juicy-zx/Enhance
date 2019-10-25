@@ -5,14 +5,8 @@ import okhttp3.ResponseBody
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-class Retrofit<T>(private val type: Type, httpMethod: HttpMethod? = null) {
-    private val mParamsBuilder: ParamsBuilder = object : ParamsBuilder() {
-        override var method: HttpMethod = httpMethod ?: HttpMethod.GET
-            set(value) {
-                field = httpMethod ?: value
-            }
-    }
-
+class Retrofit<T>(private val type: Type) {
+    private val mParamsBuilder = ParamsBuilder()
     val paramsBuilder: IParamsBuilder get() = mParamsBuilder
     fun newCall(callFactory: okhttp3.Call.Factory): Call<T> =
         OkHttpCall(callFactory, mParamsBuilder, responseBodyConverter())
@@ -30,13 +24,8 @@ class Retrofit<T>(private val type: Type, httpMethod: HttpMethod? = null) {
     }
 
     companion object {
-        internal var converterFactories: MutableList<ConverterFactory> =
-            mutableListOf(DefaultConverterFactory)
-
-        fun addConverterFactory(converterFactory: ConverterFactory) {
-            converterFactories.add(converterFactory)
-        }
-
+        internal var converterFactories: MutableList<ConverterFactory> = mutableListOf(DefaultConverterFactory)
+        fun addConverterFactory(converterFactory: ConverterFactory) = converterFactories.add(converterFactory)
 
         @Suppress("UNCHECKED_CAST")
         internal fun <T> requestBodyConverter(type: Type): Converter<T, RequestBody> {
@@ -63,11 +52,11 @@ class Retrofit<T>(private val type: Type, httpMethod: HttpMethod? = null) {
             return requireNotNull(converter) { "Could not locate String converter for $type" }
         }
 
-        inline fun <reified T> create(httpMethod: HttpMethod? = null): Retrofit<T> {
+        inline fun <reified T> create(): Retrofit<T> {
             val base = object : TypeBase<T>() {}
             val superType = base::class.java.genericSuperclass!!
             val type = (superType as ParameterizedType).actualTypeArguments.first()!!
-            return Retrofit(type, httpMethod)
+            return Retrofit(type)
         }
     }
 }

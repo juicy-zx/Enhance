@@ -7,13 +7,14 @@ import okhttp3.MultipartBody
 import okhttp3.Request
 import java.io.File
 
-internal abstract class ParamsBuilder : IParamsBuilder {
+internal class ParamsBuilder : IParamsBuilder {
     private val parameterHandlers = ArrayList<ParameterHandler<*>>()
     private var contentType: MediaType? = null
     private var headers: Headers? = null
     override var hasBody: Boolean = false
     override var url: String? = null
-    final override var body: Any? = null
+    override var method: HttpMethod = HttpMethod.GET
+    override var body: Any? = null
         set(value) {
             require(!(isFormEncoded || isMultipart)) { "Body parameters cannot be used with form or multi-part encoding." }
             if (value != null) {
@@ -22,19 +23,19 @@ internal abstract class ParamsBuilder : IParamsBuilder {
                 parameterHandlers.add(Body(value, converter))
             }
         }
-    final override var isFormEncoded: Boolean = false
+    override var isFormEncoded: Boolean = false
         set(value) {
             require(!(value && isMultipart)) { "Only one encoding is allowed." }
             field = value
         }
-    final override var isMultipart: Boolean = false
+    override var isMultipart: Boolean = false
         set(value) {
             require(!(value && isFormEncoded)) { "Only one encoding is allowed." }
             field = value
         }
 
-    final override fun query(vararg queries: Pair<String, Any?>, encoded: Boolean) = query(mapOf(*queries), encoded)
-    final override fun query(queries: Map<String, Any?>, encoded: Boolean) {
+    override fun query(vararg queries: Pair<String, Any?>, encoded: Boolean) = query(mapOf(*queries), encoded)
+    override fun query(queries: Map<String, Any?>, encoded: Boolean) {
         for ((name, value) in queries) {
             if (value == null) {
                 parameterHandlers.add(Query(name, value, encoded, null))
@@ -46,8 +47,8 @@ internal abstract class ParamsBuilder : IParamsBuilder {
         }
     }
 
-    final override fun header(vararg headers: Pair<String, Any>) = header(mapOf(*headers))
-    final override fun header(headers: Map<String, Any>) {
+    override fun header(vararg headers: Pair<String, Any>) = header(mapOf(*headers))
+    override fun header(headers: Map<String, Any>) {
         for ((name, value) in headers) {
             val type = value.javaClass
             val converter = Retrofit.stringConverter<Any>(type)
@@ -55,7 +56,7 @@ internal abstract class ParamsBuilder : IParamsBuilder {
         }
     }
 
-    final override fun headers(vararg headers: String) {
+    override fun headers(vararg headers: String) {
         val builder = Headers.Builder()
         for (header in headers) {
             val colon = header.indexOf(':')
@@ -77,8 +78,8 @@ internal abstract class ParamsBuilder : IParamsBuilder {
         this.headers = builder.build()
     }
 
-    final override fun field(vararg fields: Pair<String, Any>, encoded: Boolean) = field(mapOf(*fields), encoded)
-    final override fun field(fields: Map<String, Any>, encoded: Boolean) {
+    override fun field(vararg fields: Pair<String, Any>, encoded: Boolean) = field(mapOf(*fields), encoded)
+    override fun field(fields: Map<String, Any>, encoded: Boolean) {
         for ((name, value) in fields) {
             val type = value.javaClass
             val converter = Retrofit.stringConverter<Any>(type)
@@ -86,8 +87,8 @@ internal abstract class ParamsBuilder : IParamsBuilder {
         }
     }
 
-    final override fun part(vararg parts: Pair<String, Any>, encoding: String) = part(mapOf(*parts), encoding)
-    final override fun part(parts: Map<String, Any>, encoding: String) {
+    override fun part(vararg parts: Pair<String, Any>, encoding: String) = part(mapOf(*parts), encoding)
+    override fun part(parts: Map<String, Any>, encoding: String) {
         for ((key, value) in parts) {
             val type = value.javaClass
             require(!MultipartBody.Part::class.java.isAssignableFrom(type.getRawType())) {
@@ -102,8 +103,8 @@ internal abstract class ParamsBuilder : IParamsBuilder {
         }
     }
 
-    final override fun part(vararg parts: MultipartBody.Part) = part(listOf(*parts))
-    final override fun part(parts: List<MultipartBody.Part>) {
+    override fun part(vararg parts: MultipartBody.Part) = part(listOf(*parts))
+    override fun part(parts: List<MultipartBody.Part>) {
         for (part in parts) {
             parameterHandlers.add(RawPart(part))
         }
