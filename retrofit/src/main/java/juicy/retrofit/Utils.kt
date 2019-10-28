@@ -37,4 +37,4 @@ internal fun throwIfFatal(t: Throwable) {
     }
 }
 
-open class TypeBase<E>
+internal open class TypeBase<E>

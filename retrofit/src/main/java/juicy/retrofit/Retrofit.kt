@@ -52,7 +52,7 @@ class Retrofit<T>(private val type: Type) {
             return requireNotNull(converter) { "Could not locate String converter for $type" }
         }
 
-        inline fun <reified T> create(): Retrofit<T> {
+        fun <T> create(): Retrofit<T> {
             val base = object : TypeBase<T>() {}
             val superType = base::class.java.genericSuperclass!!
             val type = (superType as ParameterizedType).actualTypeArguments.first()!!
