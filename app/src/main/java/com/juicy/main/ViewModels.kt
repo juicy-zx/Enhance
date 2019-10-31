@@ -31,9 +31,9 @@ fun ViewModel.cancelAll() {
     viewModelScope.coroutineContext.cancelChildren()
 }
 
-suspend fun <E> Deferred<E?>.getResult(result: (E) -> Unit) = getResult(result, null)
+suspend inline fun <E> Deferred<E?>.getResult(result: (E) -> Unit) = getResult(result, {})
 
-suspend fun <T> Deferred<T?>.getResult(result: (T) -> Unit, error: ((Exception) -> Unit)? = null) {
+suspend inline fun <T> Deferred<T?>.getResult(result: (T) -> Unit, error: ((Exception) -> Unit)) {
     try {
         val t = await()
         t ?: throw NullPointerException("Server return null")
@@ -41,7 +41,7 @@ suspend fun <T> Deferred<T?>.getResult(result: (T) -> Unit, error: ((Exception) 
     } catch (e: Exception) {
         e.printStackTrace()
         if (e !is CancellationException) {
-            error?.invoke(e)
+            error.invoke(e)
         }
     }
 }
