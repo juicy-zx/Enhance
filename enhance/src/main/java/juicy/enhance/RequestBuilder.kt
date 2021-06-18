@@ -1,4 +1,4 @@
-package juicy.retrofit
+package juicy.enhance
 
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl

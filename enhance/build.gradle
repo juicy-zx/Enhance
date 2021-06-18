@@ -1,7 +1,7 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
-//apply from: 'Bintray.gradle'
+apply from: 'Publish.gradle'
 
 dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.2.0'

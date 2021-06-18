@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import juicy.enhance.Enhance
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import java.io.File
@@ -39,6 +40,13 @@ object HttpUtils {
             .registerTypeAdapter(Float::class.java, FloatDefaultAdapter())
             .registerTypeAdapter(String::class.java, StringDefaultAdapter())
             .create()
+    }
+
+    val enhance: Enhance by lazy {
+        Enhance.Builder().apply {
+            callFactory = okHttpClient
+            addConverterFactory(GsonConverterFactory.create(gson))
+        }.build()
     }
 
     private class CacheControlInterceptor : Interceptor {

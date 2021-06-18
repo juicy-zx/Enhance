@@ -1,4 +1,4 @@
-package juicy.retrofit
+package juicy.enhance
 
 import okhttp3.RequestBody
 import okhttp3.ResponseBody

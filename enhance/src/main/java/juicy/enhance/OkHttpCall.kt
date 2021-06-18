@@ -1,15 +1,16 @@
-package juicy.retrofit
+package juicy.enhance
 
 import okhttp3.*
 import okio.*
 
-internal class OkHttpCall<T>(
+class OkHttpCall<T> (
     private val callFactory: okhttp3.Call.Factory,
     private val requestBuilder: ParamsBuilder,
     private val responseConverter: Converter<ResponseBody, T>
 ) : Call<T> {
     private var rawCall: okhttp3.Call? = null
     private var creationFailure: Throwable? = null
+
     @Volatile
     private var canceled = false
     private var executed = false

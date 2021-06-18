@@ -2,8 +2,9 @@ package com.juicy.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import juicy.retrofit.IParamsBuilder
-import juicy.retrofit.Retrofit
+import juicy.enhance.IParamsBuilder
+import juicy.enhance.Enhance
+import juicy.enhance.ParamsBuilder
 import kotlinx.coroutines.*
 import okhttp3.Call
 import kotlin.coroutines.CoroutineContext
@@ -15,15 +16,12 @@ fun ViewModel.newScope(
     block: suspend CoroutineScope.() -> Unit
 ): Job = viewModelScope.launch(context, start) { supervisorScope(block) }
 
-inline fun <T> CoroutineScope.httpAsync(
+inline fun <reified T> CoroutineScope.httpAsync(
     context: CoroutineContext = Dispatchers.IO,
-    callFactory: Call.Factory = HttpUtils.okHttpClient,
     crossinline builder: IParamsBuilder.() -> Unit
 ): Deferred<T?> {
     return async(context, CoroutineStart.LAZY) {
-        val retrofit = Retrofit.create<T>()
-        retrofit.paramsBuilder.apply(builder)
-        retrofit.newCall(callFactory).execute()
+        HttpUtils.enhance.newCall<T>(builder).execute()
     }
 }
 

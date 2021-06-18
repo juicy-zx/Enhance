@@ -3,8 +3,8 @@ package com.juicy.main
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.reflect.TypeToken
-import juicy.retrofit.Converter
-import juicy.retrofit.ConverterFactory
+import juicy.enhance.Converter
+import juicy.enhance.ConverterFactory
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -46,7 +46,7 @@ private class GsonResponseBodyConverter<T>(private val gson: Gson, private val a
 
 private class FileRequestBodyConverter : Converter<File, RequestBody> {
     private val mediaType = "application/octet-stream".toMediaTypeOrNull()
-    override fun convert(value: File): RequestBody? = value.asRequestBody(mediaType)
+    override fun convert(value: File): RequestBody = value.asRequestBody(mediaType)
 }
 
 private class GsonRequestBodyConverter<T>(private val gson: Gson, private val adapter: TypeAdapter<T>) :

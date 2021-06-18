@@ -1,4 +1,4 @@
-package juicy.retrofit
+package juicy.enhance
 
 import okhttp3.Headers
 import okhttp3.MediaType
@@ -7,7 +7,7 @@ import okhttp3.MultipartBody
 import okhttp3.Request
 import java.io.File
 
-internal class ParamsBuilder : IParamsBuilder {
+class ParamsBuilder(private val enhance: Enhance) : IParamsBuilder {
     private val parameterHandlers = ArrayList<ParameterHandler<*>>()
     private var contentType: MediaType? = null
     private var headers: Headers? = null
@@ -19,7 +19,7 @@ internal class ParamsBuilder : IParamsBuilder {
             require(!(isFormEncoded || isMultipart)) { "Body parameters cannot be used with form or multi-part encoding." }
             if (value != null) {
                 val type = value.javaClass
-                val converter = Retrofit.requestBodyConverter<Any>(type)
+                val converter = enhance.requestBodyConverter<Any>(type)
                 parameterHandlers.add(Body(value, converter))
             }
         }
@@ -41,7 +41,7 @@ internal class ParamsBuilder : IParamsBuilder {
                 parameterHandlers.add(Query(name, value, encoded, null))
             } else {
                 val type = value.javaClass
-                val converter = Retrofit.stringConverter<Any>(type)
+                val converter = enhance.stringConverter<Any>(type)
                 parameterHandlers.add(Query(name, value, encoded, converter))
             }
         }
@@ -51,7 +51,7 @@ internal class ParamsBuilder : IParamsBuilder {
     override fun header(headers: Map<String, Any>) {
         for ((name, value) in headers) {
             val type = value.javaClass
-            val converter = Retrofit.stringConverter<Any>(type)
+            val converter = enhance.stringConverter<Any>(type)
             parameterHandlers.add(Header(name, value, converter))
         }
     }
@@ -82,7 +82,7 @@ internal class ParamsBuilder : IParamsBuilder {
     override fun field(fields: Map<String, Any>, encoded: Boolean) {
         for ((name, value) in fields) {
             val type = value.javaClass
-            val converter = Retrofit.stringConverter<Any>(type)
+            val converter = enhance.stringConverter<Any>(type)
             parameterHandlers.add(Field(name, value, encoded, converter))
         }
     }
@@ -94,7 +94,7 @@ internal class ParamsBuilder : IParamsBuilder {
             require(!MultipartBody.Part::class.java.isAssignableFrom(type.getRawType())) {
                 "Part parameters using the MultipartBody.Part must not include a part name."
             }
-            val converter = Retrofit.requestBodyConverter<Any>(type)
+            val converter = enhance.requestBodyConverter<Any>(type)
             val headers = Headers.headersOf(
                 "Content-Disposition", "form-data; name=\"$key\"" +
                         if (value is File) "; filename=\"${value.name}\"" else "", "Content-Transfer-Encoding", encoding

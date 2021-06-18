@@ -1,4 +1,4 @@
-package juicy.retrofit
+package juicy.enhance
 
 import java.lang.reflect.*
 import java.lang.reflect.Array
@@ -37,4 +37,4 @@ internal fun throwIfFatal(t: Throwable) {
     }
 }
 
-internal open class TypeBase<E>
+interface TypeBase<T>

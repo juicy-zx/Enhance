@@ -4,7 +4,6 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.SparseArray
-import android.util.SparseIntArray
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -12,23 +11,20 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
-import juicy.retrofit.IParamsBuilder
-import juicy.retrofit.Retrofit
-import kotlinx.android.synthetic.main.activity_main.*
+import com.juicy.main.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        Retrofit.addConverterFactory(GsonConverterFactory.create(HttpUtils.gson))
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         val mainModel = ViewModelProviders.of(this).get(MainModel::class.java)
-        recyclerView.adapter = Adapter(mainModel.articleList)
+        binding.recyclerView.adapter = Adapter(mainModel.articleList)
         mainModel.resultLiveData.observe(this, Observer<ReportBo> { reportBo ->
             if (reportBo.success) {
-                recyclerView.adapter?.notifyDataSetChanged()
+                binding.recyclerView.adapter?.notifyDataSetChanged()
             } else {
                 Toast.makeText(this, reportBo.errorMsg, Toast.LENGTH_SHORT).show()
             }
